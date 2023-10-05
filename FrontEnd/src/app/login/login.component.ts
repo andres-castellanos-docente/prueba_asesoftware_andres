@@ -33,8 +33,8 @@ export class LoginComponent implements OnInit {
        password: [null, [Validators.required, Validators.maxLength(255)]]
      });*/
     this.loginForm = this.builder.group({
-      username: ['user', [Validators.required, Validators.maxLength(255)]],
-      password: ['user', [Validators.required, Validators.maxLength(255)]]
+      username: ['Admin', [Validators.required, Validators.maxLength(255)]],
+      password: ['Admin', [Validators.required, Validators.maxLength(255)]]
     });
 
     if (localStorage.getItem('dark') === 'S') {
@@ -79,10 +79,11 @@ export class LoginComponent implements OnInit {
     }
     const loginModelEnv = new LoginModel(this.loginForm.value);
     this.cargServ.detenCargando();
-    if ((this.loginForm.controls.username.value === 'user') && (this.loginForm.controls.password.value === 'user')){
+    if ((this.loginForm.controls.username.value === 'Admin') && (this.loginForm.controls.password.value === 'Admin')){
         localStorage.setItem('token', 'aa');
         localStorage.setItem('role', 'Admin');
         const role = 'Admin';
+        sessionStorage.setItem('usuario', this.loginForm.controls.username.value);
         if (role === 'Admin') {
           this.router.navigate(['/modulos/turnos']);
         }

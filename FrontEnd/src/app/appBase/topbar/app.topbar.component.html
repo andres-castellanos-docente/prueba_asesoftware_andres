@@ -4,9 +4,13 @@
   </button>
   <div class="displayblock textcenter widtitle">
     Encabezado
+    <label class="textright">
+      {{Usuario}}
+    </label>
   </div>
 
   <span class="topbar-themeswitcher">
+
     <mat-slide-toggle [checked]="darken" (change)="onChange($event.checked)"></mat-slide-toggle>
   </span>
 </div>

@@ -3,27 +3,40 @@ import {subirAnimation} from '../../../animations/listanim.animations';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {AppCargandoService} from '../../../appBase/cargando/app.cargando.service';
-import {UsuariosService} from '../../services/usuarios.service';
+import {TurnosService} from '../../services/turnos.service';
 import {UsuariosModel} from '../../models/usuarios.model';
 import {MatDialog} from '@angular/material/dialog';
-import {DialogMessagesComponent} from './diagmessages.component';
-import {DialogCreatUsuariosComponent} from './dialog-creat-usuarios/dialog-creat-usuarios.component';
-import {DialogConfElimComponent} from './diagconfelim.component';
+import {MatSelectChange} from '@angular/material/select';
+import {TurnosModel} from '../../models/turnos.model';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {DatePipe} from '@angular/common';
 
 @Component({
-  selector: 'app-usuarios',
+  selector: 'app-turnos',
   templateUrl: './turnos.component.html',
   styleUrls: ['./turnos.component.scss'],
   animations: [subirAnimation]
 })
 export class TurnosComponent implements OnInit {
   dataUsuarios: UsuariosModel[];
+  dataComercios: any[];
+  dataServicios: any[];
   dataSource: MatTableDataSource<UsuariosModel>;
-  displayedColumns: string[] = ['editar', 'pnombre', 'snombre', 'papellid', 'sapellid', 'fechaingreso', 'salario', 'cargo', 'eliminar'];
+  displayedColumns: string[] = [  'NOM_COMERCIO', 'NOM_SERVICIO',  'FECHA_TURNO', 'HORA_INICIO', 'HORA_FIN'];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   indexElEd: number;
+  foods: any;
+  private comercSel: any;
+  private servicioSel: any;
+  fechaini: any;
+  fechafin: any;
+  formSubmited: boolean;
+  maxIni: Date;
+  maxFin: Date;
 
-  constructor(private usuariosService: UsuariosService, private cargServ: AppCargandoService, public dialog: MatDialog) {
+  constructor(private usuariosService: TurnosService, private cargServ: AppCargandoService, public dialog: MatDialog) {
+    this.maxIni = new Date(new Date().getFullYear() + 1, 12, 31);
+    this.maxFin = new Date(new Date().getFullYear() + 1, 12, 31);
   }
 
   ngOnInit(): void {
@@ -35,105 +48,60 @@ export class TurnosComponent implements OnInit {
       this.dataSource.paginator = this.paginator;
       this.cargServ.detenCargando();
     });
-  }
 
-  eliminar(UsuarioEl: UsuariosModel, indexEl: number): void {
-    // Se debe que validar la página actual para tomar el índice correcto a eliminar
-    const pagact = this.paginator.pageIndex;
-    if (pagact === 0) {
-      this.indexElEd = indexEl;
-    } else {
-      const pagsize = this.paginator.pageSize;
-      this.indexElEd = (pagsize * pagact) + indexEl;
-    }
+    this.usuariosService.listarComercios().subscribe((res: Response) => {
 
-    const dialogRef = this.dialog.open(DialogConfElimComponent, {
-      minWidth: '320px',
-      maxWidth: '532px',
-      data: {message: '🤔 ¿Desea Borrar el Usuario ' + UsuarioEl.pnombre + ' ' + UsuarioEl.papellid + '?', idUsuarioElim: UsuarioEl.id}
+      this.dataComercios = (res as any).comercios;
+
+      this.cargServ.detenCargando();
     });
-    dialogRef.afterClosed().subscribe(result => {
-      // Se verifica si es diferente de nil para evitar error que ocurre al oprimir Esc
-      if (result) {
-        if (result.result) {
-          if ((result.result === true)) {
-
-            this.dialog.open(DialogMessagesComponent, {
-              minWidth: '320px',
-              maxWidth: '532px',
-              data: {message: 'Usuario Eliminado 😌'}
-            });
-            this.dataUsuarios.splice(this.indexElEd, 1);
-            this.dataSource = new MatTableDataSource<UsuariosModel>(this.dataUsuarios);
-            this.dataSource.paginator = this.paginator;
-          }
-        }
-      }
-    });
-
 
 
   }
 
-  editar(UsuarioEd: UsuariosModel, indexEd: number): void {
-    // Se debe que validar la página actual para tomar el índice correcto a editar
-    const pagact = this.paginator.pageIndex;
-    if (pagact === 0) {
-      this.indexElEd = indexEd;
-    } else {
-      const pagsize = this.paginator.pageSize;
-      this.indexElEd = (pagsize * pagact) + indexEd;
-    }
 
-    const dialogRef = this.dialog.open(DialogCreatUsuariosComponent, {
-      minWidth: '320px',
-      maxWidth: '490px',
-      data: {dataed: UsuarioEd}
+
+  cambiarComerc($event: MatSelectChange): void {
+    this.cargServ.iniciarCargando();
+    this.comercSel = $event.value;
+    this.usuariosService.listarServicios($event.value).subscribe((res: Response) => {
+      this.dataServicios = (res as any).servicios;
+      this.cargServ.detenCargando();
     });
-    dialogRef.afterClosed().subscribe(result => {
-      // Se verifica si es diferente de nil para evitar error que ocurre al oprimir Esc
-      if (result) {
-        if (result.result) {
-          if ((result.result === true) && (result.dataAdEd)) {
-            this.dialog.open(DialogMessagesComponent, {
-              minWidth: '320px',
-              maxWidth: '532px',
-              data: {message: 'Usuario Editado 😃'}
-            });
-            this.dataUsuarios[this.indexElEd] = result.dataAdEd;
-            this.dataSource = new MatTableDataSource<UsuariosModel>(this.dataUsuarios);
-            this.dataSource.paginator = this.paginator;
-          }
-        }
-      }
+
+  }
+
+  cambiarServicio($event: MatSelectChange): void {
+    this.servicioSel = $event.value;
+
+  }
+
+  genTurnos(): void {
+    this.cargServ.iniciarCargando();
+    const turn: TurnosModel = new TurnosModel(null);
+    debugger;
+    turn.fecha_ini = this.fechaini;
+    turn.id_servicio = this.servicioSel;
+    turn.fecha_fin = this.fechafin;
+    debugger;
+    this.usuariosService.genTurnos(turn).subscribe((res: Response) => {
+      debugger;
+      this.dataUsuarios = res as any;
+      this.dataSource = new MatTableDataSource<UsuariosModel>(this.dataUsuarios);
+      this.dataSource.paginator = this.paginator;
+      this.cargServ.detenCargando();
     });
   }
 
-  createDialog(): void {
-    const dialogRef = this.dialog.open(DialogCreatUsuariosComponent, {
-      minWidth: '320px',
-      maxWidth: '490px',
-      data: {dataed: null}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      // Se verifica si es diferente de nil para evitar error que ocurre al oprimir Esc
-      if (result) {
-        if (result.result) {
-          if ((result.result === true) && (result.dataAdEd)) {
-            this.dialog.open(DialogMessagesComponent, {
-              minWidth: '320px',
-              maxWidth: '532px',
-              data: {message: 'Usuario Creado 😃'}
-            });
-            this.dataUsuarios.push(result.dataAdEd);
-            this.dataSource = new MatTableDataSource<UsuariosModel>(this.dataUsuarios);
-            this.dataSource.paginator = this.paginator;
-          }
-        }
-      }
-    });
+  IniDateChange($event: MatDatepickerInputEvent<any, any>): void {
+    this.fechaini = this.convertDate($event.value);
   }
 
-
+  FinDateChange($event: MatDatepickerInputEvent<any, any>): void {
+    this.fechafin = this.convertDate($event.value);
+  }
+  convertDate(value): string{
+    const datepipe: DatePipe = new DatePipe('en-US');
+    return  datepipe.transform(value, 'dd/MM/YYYY');
+  }
 }

@@ -4,6 +4,7 @@ import {
   derAIzAnimation,
   IzADerAnimation
 } from '../../animations/listanim.animations';
+import {Session} from 'protractor';
 
 @Component({
   selector: 'app-topbar',
@@ -12,8 +13,10 @@ import {
 })
 export class AppTopBarComponent implements OnInit {
   darken: boolean;
+  Usuario: any;
 
   constructor(public app: AppprincComponent) {
+    this.Usuario = sessionStorage.getItem('usuario');
   }
 
   ngOnInit(): void {

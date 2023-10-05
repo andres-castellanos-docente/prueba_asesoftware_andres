@@ -1,57 +1,75 @@
 <div class="marginauto">
   <div class="mat-table-scroll padtop" [@subirAnimation]>
-    <button class="boton" (click)="createDialog()">Crear <i class="fa fa-plus-square"></i></button>
+    <div class="title">Generación de Turnos</div>
+
+    <mat-form-field class="margright20">
+      <mat-label>Comercio</mat-label>
+      <mat-select  (selectionChange)="cambiarComerc($event)">
+        <mat-option *ngFor="let comerc of dataComercios" [value]="comerc.id_comercio">
+          {{comerc.nombre_comercio}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="margright20">
+      <mat-label>Servicio</mat-label>
+      <mat-select  (selectionChange)="cambiarServicio($event)">
+        <mat-option *ngFor="let serv of dataServicios" [value]="serv.id_servicio">
+          {{serv.nom_servicio}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="matfielddate margright20"  [ngClass]="{ 'ng-invalid mat-form-field-invalid':  false && formSubmited }">
+      <mat-label>Fecha Inicio</mat-label>
+      <input  (dateChange)="IniDateChange($event)" [max]="maxIni"  matInput [matDatepicker]="pickerIni">
+      <mat-datepicker-toggle matSuffix [for]="pickerIni"></mat-datepicker-toggle>
+      <mat-datepicker #pickerIni></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="matfielddate margright20"  [ngClass]="{ 'ng-invalid mat-form-field-invalid':  false && formSubmited }">
+      <mat-label>Fecha Fin</mat-label>
+      <input  (dateChange)="FinDateChange($event)" [max]="maxFin"  matInput [matDatepicker]="pickerFin">
+      <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+      <mat-datepicker #pickerFin ></mat-datepicker>
+    </mat-form-field>
+    <button class="boton" (click)="genTurnos()">Generar</button>
+
     <table class="centerdiv" mat-table [dataSource]="dataSource">
-      <ng-container matColumnDef="editar">
-        <th style="max-width:60px" mat-header-cell *matHeaderCellDef> Editar</th>
-        <td style="max-width:60px" class="tcenter" mat-cell *matCellDef="let element;let i = index;">
-          <button class="botons" (click)="editar(element, i)"><i class="fa fa-edit" aria-hidden="true"></i>
-          </button>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="pnombre">
-        <th style="min-width:120px" mat-header-cell *matHeaderCellDef>Primer Nombre</th>
+      <ng-container matColumnDef="NOM_COMERCIO">
+        <th style="min-width:120px" mat-header-cell *matHeaderCellDef>Comercio</th>
         <td style="min-width:120px" class="tcenter" mat-cell
-            *matCellDef="let element"> {{element.pnombre}} </td>
-      </ng-container>
-      <ng-container matColumnDef="snombre">
-        <th style="min-width:120px" mat-header-cell *matHeaderCellDef>Segundo Nombre</th>
-        <td style="min-width:120px" class="tcenter" mat-cell
-            *matCellDef="let element"> {{element.snombre}} </td>
+            *matCellDef="let element"> {{element.NOM_COMERCIO}} </td>
       </ng-container>
 
-      <ng-container matColumnDef="papellid">
-        <th style="min-width:120px" mat-header-cell *matHeaderCellDef>Primer Apellido</th>
+      <ng-container matColumnDef="NOM_SERVICIO">
+        <th style="min-width:120px" mat-header-cell *matHeaderCellDef>Servicio</th>
         <td style="min-width:120px" class="tcenter" mat-cell
-            *matCellDef="let element"> {{element.papellid}} </td>
+            *matCellDef="let element"> {{element.NOM_SERVICIO}} </td>
       </ng-container>
-      <ng-container matColumnDef="sapellid">
-        <th style="min-width:150px" mat-header-cell *matHeaderCellDef> Segundo Apellido</th>
+
+      <ng-container matColumnDef="FECHA_TURNO">
+        <th style="min-width:120px" mat-header-cell *matHeaderCellDef>Fecha Turno</th>
+        <td style="min-width:120px" class="tcenter" mat-cell
+            *matCellDef="let element"> {{element.FECHA_TURNO | date: 'dd/MM/yyyy'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="HORA_INICIO">
+        <th style="min-width:150px" mat-header-cell *matHeaderCellDef> Hora Inicio</th>
         <td style="min-width:150px" class="tcenter" mat-cell
-            *matCellDef="let element"> {{element.sapellid}} </td>
+            *matCellDef="let element"> {{element.HORA_INICIO | replace : '.0' : '' | replace : ':0:' : ':00:' | replace : '0 ' : ''
+          | replace : ':0' : ':00'
+          | replace : ':000' : ':00'}} </td>
       </ng-container>
-      <ng-container matColumnDef="fechaingreso">
-        <th style="min-width:150px" mat-header-cell *matHeaderCellDef> Fecha Ingreso</th>
+      <ng-container matColumnDef="HORA_FIN">
+        <th style="min-width:150px" mat-header-cell *matHeaderCellDef> Hora Fin</th>
         <td style="min-width:150px" class="tcenter" mat-cell
-            *matCellDef="let element"> {{element.fechaingreso | date }} </td>
+            *matCellDef="let element"> {{element.HORA_FIN | replace : '.0' : '' | replace : ':0:' : ':00:' | replace : '0 ' : ''
+          | replace : ':0' : ':00'
+          | replace : ':000' : ':00'}} </td>
       </ng-container>
-      <ng-container matColumnDef="salario">
-        <th style="width:150px" mat-header-cell *matHeaderCellDef> Salario</th>
-        <td style="width:150px" class="tcenter" mat-cell
-            *matCellDef="let element"> {{element.salario | number}} </td>
-      </ng-container>
-      <ng-container matColumnDef="cargo">
-        <th style="width:150px" mat-header-cell *matHeaderCellDef> Cargo</th>
-        <td style="width:150px" class="tcenter" mat-cell
-            *matCellDef="let element"> {{element.cargo}} </td>
-      </ng-container>
-      <ng-container matColumnDef="eliminar">
-        <th style="max-width:60px" mat-header-cell *matHeaderCellDef> Eliminar</th>
-        <td style="max-width:60px" class="tcenter" mat-cell *matCellDef="let element;let i = index;">
-          <button class="botons" (click)="eliminar(element, i)"><i class="fa fa-trash" aria-hidden="true"></i>
-          </button>
-        </td>
-      </ng-container>
+
+
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>

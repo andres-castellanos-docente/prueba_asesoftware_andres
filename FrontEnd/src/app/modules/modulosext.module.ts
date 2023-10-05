@@ -3,10 +3,9 @@ import { ModulosextRoutingModule } from './modulosext-routing.module';
 import { HomeComponent } from './formas/home/home.component';
 import {SharedModule} from '../SharedModule';
 import { TurnosComponent } from './formas/turnos/turnos.component';
-import {UsuariosService} from './services/usuarios.service';
+import {TurnosService} from './services/turnos.service';
 import {DialogMessagesComponent} from './formas/turnos/diagmessages.component';
-import {DialogConfElimComponent} from './formas/turnos/diagconfelim.component';
-import { DialogCreatUsuariosComponent } from './formas/turnos/dialog-creat-usuarios/dialog-creat-usuarios.component';
+import {ReplacePipe} from './pipes/ReplacePipe';
 
 @NgModule({
   imports: [
@@ -17,10 +16,9 @@ import { DialogCreatUsuariosComponent } from './formas/turnos/dialog-creat-usuar
     HomeComponent,
     TurnosComponent,
     DialogMessagesComponent,
-    DialogConfElimComponent,
-    DialogCreatUsuariosComponent
+    ReplacePipe
   ],
   entryComponents: [],
-  providers: [ UsuariosService ]
+  providers: [ TurnosService ]
 })
 export class ModulosextModule { }

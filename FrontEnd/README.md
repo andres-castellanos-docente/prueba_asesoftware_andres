@@ -3,7 +3,7 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.17.
 
 
-COMPILAR CON NODEJS 16
+COMPILAR CON NODEJS 14.0
 
 * Validar environment la ip del backend
 

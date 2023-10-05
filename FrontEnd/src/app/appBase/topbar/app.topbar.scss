@@ -29,7 +29,10 @@
 .displayblock{
   display: inline-block;
 }
-
+.textright{
+  float:right;
+  padding-right: 1rem;
+}
 
 .widtitle{
   width: calc(100% - 90px);
